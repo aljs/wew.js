@@ -1,6 +1,6 @@
 {
   "name": "wew.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Reveal animations when elements are within the viewport (on load, scroll and resize). WOW.js alternative with MIT license. Based on Josh Johnson's Animate.js library.",
   "repository": {
     "type": "git",
@@ -12,7 +12,7 @@
     "url": "https://github.com/aljs/wew.js/issues"
   },
   "homepage": "https://github.com/aljs/wew.js",
-  "main": "./assets/js/dist/wew.js",
+  "main": "./dist/wew.min.js",
   "browserDependencies": {},
   "devDependencies": {
     "gulp": "~3.9.0",
