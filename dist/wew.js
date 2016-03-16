@@ -1,3 +1,4 @@
+/*! wew.js v1.0.0 | (c) 2016 Alex Ledak | https://github.com/aljs/wew.js */
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         define(function() {
@@ -6,7 +7,7 @@
     } else if (typeof exports === 'object') {
         module.exports = factory;
     } else {
-        root.Animate = factory(root);
+        root.Wew = factory(root);
     }
 })(this, function (root) {
 
@@ -16,10 +17,10 @@
         var el = root.document.createElement("fakeelement");
         var defaultOptions = {
             animatedClass: 'js-animated',
-            offset: 0.5,
-            delay: 0,
-            target: '[data-animate]',
-            removeAnimations: true,
+            animateLibClass: 'animated',
+            offset: 0,
+            target: '.wew',
+            keyword: 'wew',
             reverse: false,
             debug: false,
             onLoad: true,
@@ -150,15 +151,21 @@
      */
     Animate.prototype._getElemOffset = function(el) {
         // Get element offset override
-        var elOffset = parseFloat(el.getAttribute('data-animation-offset'));
-
+        var elOffset = parseFloat(el.getAttribute('data-'+this.options.keyword+'-offset'));
         if(!isNaN(elOffset)) {
             // If elOffset isn't between 0 and 1, round it up or down
-            if(elOffset > 1) elOffset = 1;
-            if(elOffset < 0) elOffset = 0;
-            return Math.max(el.offsetHeight*elOffset);
+            if(elOffset <= 1) {
+                if(elOffset < 0) elOffset = 0;
+                return Math.max(el.offsetHeight*elOffset);
+            } else {
+                return elOffset;
+            }
         } else if(!isNaN(this.options.offset)){
-            return Math.max(el.offsetHeight*this.options.offset);
+            if(this.options.offset <= 1) {
+                return Math.max(el.offsetHeight*this.options.offset);
+            } else {
+                return this.options.offset;
+            }
         }
     };
 
@@ -203,8 +210,7 @@
      * @return {Boolean}
      */
     Animate.prototype._isVisible = function(el){
-        var visibility = el.getAttribute('data-visibility');
-        return true ? visibility === 'true' : '';
+        return true ? el.style.visibility === 'visible' : '';
     };
 
     /**
@@ -235,25 +241,25 @@
      * @private
      * @param {Node} el Element to target
      */
-    Animate.prototype._addAnimation = function(el){
-
-        el.setAttribute('data-visibility', true);
-        var animations = el.getAttribute('data-animation-classes').split(' ');
-        var animationDelay = parseInt(el.getAttribute('data-animation-delay'), 10) || this.options.delay;
-
-        if(animationDelay && this._isType('Number', animationDelay) && animationDelay !== 0) {
-            setTimeout(function() {
-                if(this.options.debug && root.console.debug) console.debug('Animation added');
-                animations.forEach(function(animation) {
-                    el.classList.add(animation);
-                });
-            }.bind(this), animationDelay);
-        } else {
+    Animate.prototype._addAnimation = function(el) {
+        var animations = el.className.split(' ');
+        animations.push(this.options.animateLibClass);
+        if(el.getAttribute('data-'+this.options.keyword+'-duration')) {
+            el.style.animationDuration = el.getAttribute('data-'+this.options.keyword+'-duration');
+        }
+        if(el.getAttribute('data-'+this.options.keyword+'-delay')) {
+            el.style.animationDelay = el.getAttribute('data-'+this.options.keyword+'-delay');
+        }
+        el.className = '';
+        //Timeout hack to trigger animation 
+        setTimeout(function() {
             if(this.options.debug && root.console.debug) console.debug('Animation added');
+            el.setAttribute('data-visibility', true);
+            el.style.visibility = 'visible';
             animations.forEach(function(animation){
                el.classList.add(animation);
             });
-        }
+        }.bind(this), 1);
 
         this._completeAnimation(el);
     };
@@ -266,24 +272,8 @@
     Animate.prototype._removeAnimation = function(el){
         el.setAttribute('data-visibility', false);
         el.removeAttribute('data-animated');
-        var animations = el.getAttribute('data-animation-classes').split(' ');
-        var animationDelay = parseInt(el.getAttribute('data-animation-delay'), 10);
-        animations.push(this.options.animatedClass);
-
-        if(animationDelay && this._isType('Number', animationDelay)) {
-            setTimeout(function() {
-                if(this.options.debug && root.console.debug) console.debug('Animation removed');
-                animations.forEach(function(animation) {
-                    el.classList.remove(animation);
-                });
-            }.bind(this), animationDelay);
-        } else {
-            if(this.options.debug && root.console.debug) console.debug('Animation removed');
-            animations.forEach(function(animation){
-               el.classList.remove(animation);
-            });
-        }
-
+        el.style.visibility = 'hidden';
+        el.classList.remove(this.options.animateLibClass);
     };
 
     /**
@@ -299,20 +289,9 @@
         el.addEventListener(animationEvent, function() {
             if(this.options.debug && root.console.debug) console.debug('Animation completed');
 
-            var removeOveride = el.getAttribute('data-animation-remove');
+            var removeOveride = el.getAttribute('data-'+this.options.keyword+'-remove');
 
-            // If remove animations on completon option is turned on
-            if(removeOveride !== 'false' && this.options.removeAnimations) {
-                // Seperate each class held in the animation classes attribute
-                var animations = el.getAttribute('data-animation-classes').split(' ');
-
-                // Remove each animation from element
-                animations.forEach(function(animation) {
-                    el.classList.remove(animation);
-                });
-            }
-
-            // Add animtion complete class
+            // Add animation complete class
             el.classList.add(this.options.animatedClass);
             // Set animated attribute to true
             el.setAttribute('data-animated', true);
@@ -361,6 +340,19 @@
         } else {
             console.error('Callback is not a function');
         }
+        
+        //Apply settings to elements
+        var els = this.elements;
+        // Loop through all elements
+        for (var i = els.length - 1; i >= 0; i--) {
+            // Store element at location 'i'
+            var el = els[i];
+            // If element is in view
+            if(!this._isInView(el)) {
+                el.style.visibility = 'hidden';
+                el.setAttribute('data-visibility', false);
+            }
+        }
 
         this.initialised = true;
     };
@@ -404,7 +396,6 @@
             var el = els[i];
             // See whether it has a reverse override
             var reverseOveride = el.getAttribute('data-animation-reverse');
-
             // If element is in view
             if(this._isInView(el)) {
                 // ..and is not already set to visible

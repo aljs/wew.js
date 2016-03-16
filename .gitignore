@@ -1,12 +1,5 @@
-# Misc
-.sass_cache
-
 # Node
 node_modules
-
-# Test
-test/results
-test/coverage
 
 ## OS X
 .DS_Store

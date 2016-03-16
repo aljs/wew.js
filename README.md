@@ -1,80 +1,64 @@
-# Animate.js [![Build Status](https://travis-ci.org/jshjohnson/animate.svg?branch=develop)](https://travis-ci.org/jshjohnson/animate) [![Dependency Status](https://david-dm.org/Rowno/grunt-mocha-cli.svg)](https://david-dm.org/Rowno/grunt-mocha-cli)
+# wew.js
 
-Trigger animations on elements when they are in view.
+Reveal animations when elements are within the viewport (on load, scroll and resize). WOW.js alternative with MIT license. Based on (Josh Johnson's Animate.js library)[https://github.com/jshjohnson/Animate].
 
-## Setup
+## Setup for new projects
 ```html
-<script src="/assets/js/dist/animate.js"></script>
+<script src="/dist/wew.min.js"></script>
 <script>
-    var animate = new Animate({
-        target: '[data-animate]',
-        animatedClass: 'js-animated',
-        offset: 0.5,
-        delay: 0,
-        removeAnimations: true,
-        reverse: false,
-        debug: false,
-        onLoad: true,
-        onScroll: true,
-        onResize: false,
-        callbackOnInit: function(){},
-        callbackOnAnimate: function(element){
-            console.log(element);
-        }
-    });
-    animate.init();
+    var wew = new Wew();
+    wew.init();
 </script>
 ```
-##### Recent changes (< v1.1.8)
-```diff
-+   callbackOnAnimate: function(element){
-        console.log(element);
-    }
--   callback: function(element){
-        console.log(element);
-    }
+
+### Setup as WOW.js replacement
+```html
+<script src="/dist/wew.min.js"></script>
+<script>
+    var wew = new Wew({
+        target: '.wow',
+        keyword: 'wow',
+    });
+    wew.init();
+</script>
 ```
 
 ## Installation
-To install via NPM, run `npm install --save-dev animate.js` 
+To install via NPM, run `npm install --save-dev wew.js` 
 
 ## Animating elements
-##### `data-animate`
+##### class=`wew`
 
-Default way of targeting an element to animate (no value required). This can be overridden to be a custom attribute or class.
-
-##### `data-animation-classes`
-
-Animations to be added to element when it is in view. To add multiple classes, seperate each class with a space (as you would normally).
+Default way of targeting an element to animate. This can be overridden to be a custom attribute or class.
 
 ### Optional element overrides
-##### `data-animation-delay`
+##### `data-wew-delay`
 
-Overide the plugin `delay` option per element.
+Delay before the animation, overide `animation-delay` of the element.
 
-##### `data-animation-offset`
+##### `data-wew-duration`
+
+Duration of the animation, overide `animation-duration` of the element.
+
+##### `data-wew-offset`
 
 Override the plugin `offset` option per element.
 
-##### `data-animation-remove`
-
-Overide the plugin `removeAnimations` option per element.
-
-##### `data-animation-reverse`
+##### `data-wew-reverse`
 
 Overide the plugin `reverse` option per element.
 
 #### Examples
 ```html
-<div data-animate data-animation-classes="animated fadeIn"></div>
-<div data-animate data-animation-classes="animated tada" data-animation-delay="1000"></div>
-<div data-animate data-animation-classes="animated bounce" data-animation-offset="0.2"></div>
-<div data-animate data-animation-classes="animated bounce" data-animation-remove="true"></div>
+<div class="wew fadeIn"></div>
+<div class="wew tada" data-wew-delay="1s"></div>
+<div class="wew bounce" data-wew-offset="0.2" data-wew-reverse="true"></div>
+<div class="wew bounce" data-wew-offset="100" data-wew-duration="5s"></div>
 ```
 
 ## Options
 #### target
-Type: `String` Default: `[data-animate]`
+Type: `String` Default: `.wew`
 
 Element/s to target. Once this element is in view, add animations.
 
@@ -83,20 +67,15 @@ Type: `String` Default: `js-animated`
 
 Class to be added to element once animation has completed.
 
+#### animateLibClass
+Type: `String` Default: `animated`
+
+Class of the animation library to apply, default is for Animate.css.
+
 #### offset
 Type: `Number` Default: `0.5` (50%)
 
-Percentage of element that needs to be in the viewport before the animation triggers.
-
-####  delay
-Type: `Number` Default: `0`
-
-Milisecond delay before animation is added to element in view.
-
-####  removeAnimations
-Type: `Boolean` Default: `true`
-
-Whether animation classes set via the `data-animation-classes` attribute should removed when the animations complete.
+If less then 1, percentage of element that needs to be in the viewport before the animation triggers. If more then 1, offset from the top of the element (in pixels).
 
 ####  reverse
 Type: `Boolean` Default: `false`
@@ -142,17 +121,7 @@ Kills event listeners and resets options.
 Adds/removes animations without the need for event listeners.
 
 ## Browser compatibility
-Animate.js is supported in modern browsers from IE9 and above (i.e. browsers that support CSS animations). Due to discrepencies in support for `Element.classList`, I would recommend including the very good [classList polyfill](https://github.com/eligrey/classList.js/) before you include animate.js. I would also suggest using Modernizr to feature detect CSS animations/transitions and apply override styling for browsers that do not support those features.
-
-Using SCSS, this may look like this:
-```css
-.animate {
-    opacity: 0;
-    .no-csstransitions &, .no-cssanimations &  {
-        opacity: 1;
-    }
-}
-```
+wew.js is supported in modern browsers from IE9 and above (i.e. browsers that support CSS animations).
 
 ## Development
 To setup a local environment: clone this repo, navigate into it's directory in a terminal window and run the following command:
@@ -160,11 +129,7 @@ To setup a local environment: clone this repo, navigate into it's directory in a
 
 ### Gulp tasks
 * ```gulp dev```
-* ```gulp test```
 * ```gulp build```
 
-## Contributions
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using Gulp...bla bla bla
-
 ## License
-MIT License 
+MIT License. Feel free to use it anywhere you want.
