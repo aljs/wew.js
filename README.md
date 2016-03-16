@@ -1,6 +1,6 @@
 # wew.js
 
-Reveal animations when elements are within the viewport (on load, scroll and resize). WOW.js alternative with MIT license. Based on (Josh Johnson's Animate.js library)[https://github.com/jshjohnson/Animate].
+Reveal animations when elements are within the viewport (on load, scroll and resize). WOW.js alternative with MIT license. Based on [Josh Johnson's Animate.js library](https://github.com/jshjohnson/Animate).
 
 ## Setup for new projects
 ```html
